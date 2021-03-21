@@ -64,6 +64,21 @@
 
     - OpenCV絡みで諸々のエラーが出る場合はググって対処する
 
+- Anaconda環境で実行する場合（動作未確認）
+
+    - pipは非推奨らしいのでconda installでopencvをインストールする
+
+        ``` bash
+        $ conda install -c conda-forge opencv
+        ```
+
+    - pillowは初めから入っているらしい
+    - `./main.py`を実行
+
+        ``` bash
+        $ python ./main.py
+        ```
+
 ### 3. マスク着用を確認
 
 - `./image/output`にマスク着用後の画像が作成されているので適宜利用する

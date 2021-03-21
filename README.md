@@ -62,8 +62,6 @@
         $ python ./main.py
         ```
 
-    - OpenCV絡みで諸々のエラーが出る場合はググって対処する
-
 - Anaconda環境で実行する場合（動作未確認）
 
     - pipは非推奨らしいのでconda installでopencvをインストールする
@@ -78,6 +76,8 @@
         ``` bash
         $ python ./main.py
         ```
+
+- OpenCV絡みで諸々のエラーが出る場合はググって対処する
 
 ### 3. マスク着用を確認
 

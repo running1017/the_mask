@@ -6,7 +6,7 @@ from PIL import Image
 
 
 def main(input_path, output_path, pathes):
-    # 分類器
+    # カスケード分類器のdict
     classifiers = {
         name:cv2.CascadeClassifier(str(pathes['cascades_data'][name])) for name in pathes['cascades_data']
     }
@@ -16,7 +16,7 @@ def main(input_path, output_path, pathes):
         source_parts = json.load(f)
 
     # 画像読み込み
-    mask_image = cv2.imread(str(pathes['mask_data']['image']), -1) # RGBAで取り込み
+    mask_image = cv2.imread(str(pathes['mask_data']['image']), -1) # 透過合成するためRGBAで取り込み
     input_image = cv2.imread(str(input_path), -1)
     input_gray = cv2.cvtColor(input_image, cv2.COLOR_BGR2GRAY)
     input_image_PIL = Image.open(input_path)
@@ -26,15 +26,16 @@ def main(input_path, output_path, pathes):
 
     # 検出した顔ごとにマスクを重ねる処理を行う
     for (x,y,w,h) in faces:
+        # パーツ認識用のグレースケールROI領域
         roi_gray = input_gray[y:y+h, x:x+w]
 
-        # 顔の中からパーツの相対座標を取得
+        # 顔の中からパーツを検出してROI内の相対座標を取得
         dest_parts = get_dest_parts(roi_gray, classifiers)
 
-        # 座標がNoneでないパーツを取得
+        # 検出できた（==座標がNoneでない）パーツ名を取得
         exist_parts = [p for p in dest_parts if dest_parts[p] is not None]
 
-        # ホモグラフィー変換の起点と終点
+        # 幾何変換の起点と終点
         source_points = np.array([source_parts[part] for part in exist_parts], dtype=np.float32)
         dest_points = np.array([dest_parts[part] for part in exist_parts], dtype=np.float32)
 
@@ -48,6 +49,7 @@ def main(input_path, output_path, pathes):
         perspective_mask_image_PIL = cv2pil(perspective_mask_image)
         input_image_PIL.paste(perspective_mask_image_PIL, (x, y), perspective_mask_image_PIL)
 
+    # 画像保存
     input_image_PIL.save(str(output_path))
 
 # 認識した顔からパーツの座標を取得
@@ -59,20 +61,20 @@ def get_dest_parts(roi, classifiers):
     eyes = eyes_centers(roi, classifiers['eyes'])
     eyes_exist = eyes[0] is not None
 
-    # 両目の傾きで上下左右を修正
+    # 両目の傾きで上下左右を補正
     eye_grad = (eyes[1][1]-eyes[0][1])/(eyes[1][0]-eyes[0][0]) if eyes_exist else 0
 
     return {
-        'right_eye':  eyes[0],
-        'left_eye':   eyes[1],
-        'nose':       parts_centers('nose', roi, classifiers),
-        'jaw':        [int(w/2 - eye_grad*h/2), h],
-        'right_side': [0, int(h/2 - eye_grad*w/2)],
-        'left_side':  [w, int(h/2 + eye_grad*w/2)],
-        'head_top':   [int(w/2 + eye_grad*h/2), 0]
+        'right_eye':  eyes[0],                                  # 右目（向かって左）
+        'left_eye':   eyes[1],                                  # 左目（向かって右）
+        'nose':       parts_centers('nose', roi, classifiers),  # 鼻
+        'jaw':        [int(w/2 - eye_grad*h/2), h],             # アゴ先
+        'right_side': [0, int(h/2 - eye_grad*w/2)],             # 右耳（向かって左端）
+        'left_side':  [w, int(h/2 + eye_grad*w/2)],             # 左耳（向かって右端）
+        'head_top':   [int(w/2 + eye_grad*h/2), 0]              # おでこの上端
     }
 
-# 推定した領域の中心座標を返す
+# 検出した領域の中心座標を返す
 # 複数個見つかった場合はリスト順で0番目
 def parts_centers(name, roi, classifiers):
     areas = classifiers[name].detectMultiScale(roi, 1.05, 10)

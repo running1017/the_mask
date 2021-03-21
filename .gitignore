@@ -1,0 +1,16 @@
+*
+!*/
+
+!.gitignore
+!.dockerignore
+!make_package.sh
+!README.md
+!the_mask.zip
+!Dockerfile
+!docker-compose.yml
+!requirements.txt
+!**/*.py
+!param_adjust.ipynb
+!image/input/*
+!image/output/*
+!data/**

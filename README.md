@@ -97,3 +97,14 @@
      ├── __init__.py
      └── wear.py
 </pre>
+
+<br><br>
+
+## 参考
+
+- [Python, OpenCVで顔検出と瞳検出（顔認識、瞳認識）](https://note.nkmk.me/python-opencv-face-detection-haar-cascade/)
+- 利用カスケードファイル
+    - https://github.com/opencv/opencv/tree/master/data/haarcascades
+    - https://github.com/opencv/opencv_contrib/tree/1311b057475664b6af118fd1a405888bad4fd839/modules/face/data/cascades
+- [最小二乗法によるホモグラフィ行列の計算（DLT法）](https://qiita.com/manteopel/items/ac435755eeebcadabf6a)
+- [OpenCVで透過画像を扱う　～スプライトを舞わせる～](https://qiita.com/mo256man/items/f7524dd34718a01fb3df)
